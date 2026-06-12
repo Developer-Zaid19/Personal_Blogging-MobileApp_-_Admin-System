@@ -1,0 +1,84 @@
+# 🔒 Node modules
+
+node_modules/
+
+# 🔒 Expo (agar use kare kabhi)
+
+.expo/
+.expo-shared/
+
+# 🔒 Logs
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 🔒 OS files
+
+.DS_Store
+Thumbs.db
+
+# 🔒 Environment files (IMPORTANT)
+
+.env
+.env.*
+
+# 🔒 Metro bundler cache
+
+.metro-cache/
+
+# 🔒 Watchman
+
+.watchmanconfig
+
+# 🔒 React Native packager
+
+*.bundle
+
+# 🔒 Android build
+
+android/.gradle/
+android/app/build/
+android/build/
+
+# 🔒 Android ke unnecessary files
+
+android/app/debug.keystore
+android/app/release/
+android/local.properties
+
+# 🔒 Signing files (VERY IMPORTANT ❌)
+
+*.keystore
+*.jks
+
+# 🔒 iOS build
+
+ios/build/
+ios/Pods/
+ios/DerivedData/
+
+# 🔒 Xcode files
+
+*.xcworkspace
+*.xcuserdata
+*.xcuserstate
+
+# 🔒 Fastlane
+
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+
+# 🔒 Misc
+
+coverage/
+dist/
+
+# 🔒 Buck (optional)
+
+android/app/buck/
+android/app/build_defs.bzl
+android/gradle.properties
+
+src/data/Hadith-Json/

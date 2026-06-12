@@ -1,0 +1,80 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        buildToolsVersion = "33.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 33
+        targetSdkVersion = 33
+        kotlinVersion = "1.8.22"
+
+        // NDK version based on architecture
+        if (System.properties['os.arch'] == "aarch64") {
+            ndkVersion = "24.0.8215888"
+        } else {
+            ndkVersion = "21.4.7075529"
+        }
+
+        // React Native Hermes flags
+        enableHermes = true        // RN ke liye
+        hermesEnabled = true       // react-native-worklets ke liye
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22")
+        classpath("com.android.tools.build:gradle:7.4.2")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("de.undercouch:gradle-download-task:4.1.2")
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+// Make hermesEnabled property globally available for subprojects
+subprojects {
+    afterEvaluate { project ->
+        if (!project.hasProperty("hermesEnabled")) {
+            project.ext.set("hermesEnabled", true)
+        }
+    }
+}
+
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            // Keep AndroidX on versions that still work with RN 0.68 / AGP 7.4
+            // and preserve compatibility with older Android devices such as Android 6.
+            force "androidx.appcompat:appcompat:1.6.1"
+            force "androidx.appcompat:appcompat-resources:1.6.1"
+            force "androidx.core:core:1.9.0"
+            force "androidx.core:core-ktx:1.9.0"
+            force "androidx.annotation:annotation-experimental:1.3.0"
+        }
+    }
+
+    repositories {
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
+        }
+        mavenCentral {
+            // We don't want to fetch react-native from Maven Central as there are
+            // older versions over there.
+            content {
+                excludeGroup "com.facebook.react"
+            }
+        }
+        google()
+        maven { url 'https://www.jitpack.io' }
+    }
+}
