@@ -65,7 +65,9 @@ export default function BlogDetailScreen({route, navigation}) {
           <Text style={[styles.title, {color: colors.text}]}>{blog.title || blog.name || 'Untitled blog'}</Text>
           <Text style={[styles.meta, {color: colors.textMuted}]}>Published {blog.createdAt || blog.updatedAt || 'recently'}</Text>
           <View style={[styles.card, {backgroundColor: colors.surface, borderColor: colors.border}]}> 
-            <Text style={[styles.body, {color: colors.text}]}>{blog.content || blog.description || 'No content available.'}</Text>
+            <Text style={[styles.body, {color: colors.text}]}>{blog.content || 'No content available.'}</Text>
+            <Text style={[styles.body, {color: colors.text}]}>{blog.para1}</Text>
+            <Text style={[styles.body, {color: colors.text}]}>{blog.para2}</Text>
           </View>
         </ScrollView>
       )}

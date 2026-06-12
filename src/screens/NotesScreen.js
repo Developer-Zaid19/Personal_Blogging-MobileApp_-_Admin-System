@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -19,6 +19,7 @@ const BASE_URL = 'https://devzaidbackend.onrender.com';
 export default function NotesScreen({navigation}) {
   const {theme} = useTheme();
   const colors = theme === 'dark' ? DARK_THEME : LIGHT_THEME;
+  const mountedRef = useRef(true);
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -29,28 +30,40 @@ export default function NotesScreen({navigation}) {
       const response = await fetch(`${BASE_URL}/api/content/notes`);
       const data = await response.json();
       const list = Array.isArray(data) ? data : data.notes || [];
-      setNotes(list);
-      setError('');
+      if (mountedRef.current) {
+        setNotes(list);
+        setError('');
+      }
     } catch (err) {
-      setError('Unable to load notes right now.');
+      if (mountedRef.current) {
+        setError('Unable to load notes right now.');
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (mountedRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   };
 
   useEffect(() => {
+    mountedRef.current = true;
     fetchNotes();
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   const openPdf = async (note) => {
-    const id = note.url 
+    const id = note?.url || note?.id || note?._id || note?.noteId ;
     if (!id) {
       Alert.alert('Missing PDF id');
       return;
     }
 
-    const pdfUrl = `${BASE_URL}/note-pdf/${id}.pdf`;
+    const isRemoteUrl = typeof id === 'string' && (id.startsWith('http://') || id.startsWith('https://'));
+    const pdfUrl = isRemoteUrl ? id : `${BASE_URL}/note-pdf/${id}.pdf`;
     const viewerUrl = `https://docs.google.com/viewer?embedded=true&url=${encodeURIComponent(pdfUrl)}`;
 
     try {
@@ -94,6 +107,7 @@ export default function NotesScreen({navigation}) {
     <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}> 
       <View style={styles.header}> 
         <View style={{flex: 1}}>
+          <Text style={[styles.brand, {color: colors.primary}]}>DeveloperZaid</Text>
           <Text style={[styles.title, {color: colors.text}]}>PDF Notes</Text>
           <Text style={[styles.subtitle, {color: colors.textMuted}]}>Download and review study notes instantly.</Text>
         </View>
@@ -129,6 +143,7 @@ export default function NotesScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {flex: 1},
   header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12},
+  brand: {fontSize: 20, fontWeight: '800', marginBottom: 4},
   title: {fontSize: 24, fontWeight: '700'},
   subtitle: {marginTop: 4, fontSize: 13},
   listContent: {paddingHorizontal: 20, paddingBottom: 20},

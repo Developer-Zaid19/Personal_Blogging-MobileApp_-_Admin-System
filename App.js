@@ -3,6 +3,7 @@ import {SafeAreaView, StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
 import {ThemeProvider, useTheme, DARK_THEME, LIGHT_THEME} from './src/context/ThemeContext';
+import {BookmarksProvider} from './src/context/BookmarksContext';
 
 const AppContent = () => {
   const {theme} = useTheme();
@@ -21,7 +22,9 @@ const AppContent = () => {
 const App = () => {
   return (
     <ThemeProvider>
-      <AppContent />
+      <BookmarksProvider>
+        <AppContent />
+      </BookmarksProvider>
     </ThemeProvider>
   );
 };

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -12,12 +12,16 @@ import {
 } from 'react-native';
 import ThemeToggle from '../components/ThemeToggle';
 import {DARK_THEME, LIGHT_THEME, useTheme} from '../context/ThemeContext';
+import {useBookmarks} from '../context/BookmarksContext';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const BASE_URL = 'https://devzaidbackend.onrender.com';
 
 export default function BlogsScreen({navigation}) {
   const {theme} = useTheme();
   const colors = theme === 'dark' ? DARK_THEME : LIGHT_THEME;
+  const {toggleBookmark, isBookmarked} = useBookmarks();
+  const mountedRef = useRef(true);
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -28,18 +32,29 @@ export default function BlogsScreen({navigation}) {
       const response = await fetch(`${BASE_URL}/api/content/blogs`);
       const data = await response.json();
       const list = Array.isArray(data) ? data : data.blogs || [];
-      setBlogs(list);
-      setError('');
+      if (mountedRef.current) {
+        setBlogs(list);
+        setError('');
+      }
     } catch (err) {
-      setError('Unable to load blogs right now.');
+      if (mountedRef.current) {
+        setError('Unable to load blogs right now.');
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (mountedRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   };
 
   useEffect(() => {
+    mountedRef.current = true;
     fetchBlogs();
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   const renderBlog = ({item}) => {
@@ -54,9 +69,9 @@ export default function BlogsScreen({navigation}) {
         style={[styles.card, {backgroundColor: colors.surface, borderColor: colors.border}]}> 
         <View style={styles.cardTopRow}>
           <Text style={[styles.cardTitle, {color: colors.text}]}>{title}</Text>
-          <View style={[styles.badge, {backgroundColor: colors.primaryGlow}]}> 
-            <Text style={[styles.badgeText, {color: colors.primary}]}>Blog</Text>
-          </View>
+          <TouchableOpacity onPress={() => toggleBookmark(item)}>
+            <Icon name={isBookmarked(item) ? 'bookmark' : 'bookmark-outline'} size={20} color={colors.primary} />
+          </TouchableOpacity>
         </View>
         <Text style={[styles.cardBody, {color: colors.textMuted}]}>{snippet}</Text>
       </TouchableOpacity>
@@ -67,6 +82,7 @@ export default function BlogsScreen({navigation}) {
     <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}> 
       <View style={styles.header}> 
         <View style={{flex: 1}}>
+          <Text style={[styles.brand, {color: colors.primary}]}>DeveloperZaid</Text>
           <Text style={[styles.title, {color: colors.text}]}>My Blog Posts</Text>
           <Text style={[styles.subtitle, {color: colors.textMuted}]}>Stories, ideas, and developer notes in one place.</Text>
         </View>
@@ -102,6 +118,7 @@ export default function BlogsScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {flex: 1},
   header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12},
+  brand: {fontSize: 20, fontWeight: '800', marginBottom: 4},
   title: {fontSize: 24, fontWeight: '700'},
   subtitle: {marginTop: 4, fontSize: 13},
   listContent: {paddingHorizontal: 20, paddingBottom: 20},
