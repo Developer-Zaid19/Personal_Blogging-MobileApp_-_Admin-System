@@ -44,7 +44,7 @@ export default function NotesScreen({navigation}) {
   }, []);
 
   const openPdf = async (note) => {
-    const id = note.id || note._id || note.noteId;
+    const id = note.url 
     if (!id) {
       Alert.alert('Missing PDF id');
       return;
