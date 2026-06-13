@@ -51,9 +51,9 @@ export default function BottomTabs() {
         },
         tabBarIcon: ({color, size}) => {
           let iconName = 'post';
-          if (route.name === 'Blogs') {
+          if (route.name === 'BlogTab') {
             iconName = 'book-open-page-variant';
-          } else if (route.name === 'Notes') {
+          } else if (route.name === 'NoteTab') {
             iconName = 'file-pdf-box';
           } else if (route.name === 'Bookmarks') {
             iconName = 'bookmark';
@@ -64,9 +64,17 @@ export default function BottomTabs() {
           return <Icon name={iconName} color={color} size={size} />;
         },
       })}>
-      <Tab.Screen name="Blogs" component={BlogStackScreen} />
+      <Tab.Screen
+        name="BlogTab"
+        component={BlogStackScreen}
+        options={{tabBarLabel: 'Blogs'}}
+      />
       <Tab.Screen name="Bookmarks" component={BookmarksScreen} />
-      <Tab.Screen name="Notes" component={NoteStackScreen} />
+      <Tab.Screen
+        name="NoteTab"
+        component={NoteStackScreen}
+        options={{tabBarLabel: 'Notes'}}
+      />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
