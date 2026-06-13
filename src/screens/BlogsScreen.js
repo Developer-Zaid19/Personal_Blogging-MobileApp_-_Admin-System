@@ -14,6 +14,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import {DARK_THEME, LIGHT_THEME, useTheme} from '../context/ThemeContext';
 import {useBookmarks} from '../context/BookmarksContext';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {getCachedBlogs, saveBlogsToCache} from '../utils/storage';
 
 const BASE_URL = 'https://devzaidbackend.onrender.com';
 
@@ -36,9 +37,16 @@ export default function BlogsScreen({navigation}) {
         setBlogs(list);
         setError('');
       }
+      await saveBlogsToCache(list);
     } catch (err) {
+      const cachedBlogs = await getCachedBlogs();
       if (mountedRef.current) {
-        setError('Unable to load blogs right now.');
+        if (cachedBlogs.length > 0) {
+          setBlogs(cachedBlogs);
+          setError('');
+        } else {
+          setError('Unable to load blogs right now.');
+        }
       }
     } finally {
       if (mountedRef.current) {

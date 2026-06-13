@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import {DARK_THEME, LIGHT_THEME, useTheme} from '../context/ThemeContext';
+import {getCachedBlog, saveBlogToCache} from '../utils/storage';
 
 const BASE_URL = 'https://devzaidbackend.onrender.com';
 
@@ -33,8 +34,15 @@ export default function BlogDetailScreen({route, navigation}) {
         const data = await response.json();
         setBlog(data);
         setError('');
+        await saveBlogToCache(data);
       } catch (err) {
-        setError('Unable to load this blog right now.');
+        const cachedBlog = await getCachedBlog(blogId);
+        if (cachedBlog) {
+          setBlog(cachedBlog);
+          setError('');
+        } else {
+          setError('Unable to load this blog right now.');
+        }
       } finally {
         setLoading(false);
       }

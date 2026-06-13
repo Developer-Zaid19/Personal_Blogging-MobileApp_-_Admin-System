@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   Linking,
   RefreshControl,
   SafeAreaView,
@@ -13,6 +14,7 @@ import {
 } from 'react-native';
 import ThemeToggle from '../components/ThemeToggle';
 import {DARK_THEME, LIGHT_THEME, useTheme} from '../context/ThemeContext';
+import {getNotesCache, saveNotesCache} from '../utils/storage';
 
 const BASE_URL = 'https://devzaidbackend.onrender.com';
 
@@ -34,9 +36,16 @@ export default function NotesScreen({navigation}) {
         setNotes(list);
         setError('');
       }
+      await saveNotesCache(list);
     } catch (err) {
+      const cachedNotes = await getNotesCache();
       if (mountedRef.current) {
-        setError('Unable to load notes right now.');
+        if (cachedNotes.length > 0) {
+          setNotes(cachedNotes);
+          setError('');
+        } else {
+          setError('Unable to load notes right now.');
+        }
       }
     } finally {
       if (mountedRef.current) {
@@ -86,10 +95,26 @@ export default function NotesScreen({navigation}) {
   const renderNote = ({item}) => {
     const title = item.title || item.name || 'Untitled note';
     const description = item.description || item.summary || 'Tap to view details or download the PDF.';
+    const imageUri = item?.image
+      ? `https://devzaidbackend.onrender.com/notes-img/${item.image}`
+      : null;
 
     return (
       <View style={[styles.card, {backgroundColor: colors.surface, borderColor: colors.border}]}> 
-        <Text style={[styles.cardTitle, {color: colors.text}]}>{title}</Text>
+        <View style={styles.previewRow}> 
+          <View style={styles.imageBubble}> 
+            {imageUri ? (
+              <Image source={{uri: imageUri}} style={styles.noteImage} resizeMode="cover" />
+            ) : (
+              <View style={[styles.imagePlaceholder, {borderColor: colors.border}]}> 
+                <Text style={[styles.imagePlaceholderText, {color: colors.textMuted}]}>No image</Text>
+              </View>
+            )}
+          </View>
+          <View style={styles.titleWrap}> 
+            <Text style={[styles.cardTitle, {color: colors.text}]}>{title}</Text>
+          </View>
+        </View>
         <Text style={[styles.cardBody, {color: colors.textMuted}]}>{description}</Text>
         <View style={styles.actions}> 
           <TouchableOpacity onPress={() => navigation.navigate('NoteDetail', {note: item})} style={[styles.secondaryBtn, {borderColor: colors.border}]}> 
@@ -99,6 +124,9 @@ export default function NotesScreen({navigation}) {
             <Text style={styles.primaryText}>Open PDF</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity onPress={() => openPdf(item)} style={[styles.downloadBtn, {borderColor: colors.border}]}> 
+          <Text style={[styles.downloadText, {color: colors.primary}]}>Download PDF</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -128,9 +156,9 @@ export default function NotesScreen({navigation}) {
         </View>
       ) : (
         <FlatList
-          data={notes}
-          keyExtractor={(item, index) => String(item.id || item._id || index)}
-          renderItem={renderNote}
+        data={notes}
+        keyExtractor={(item, index) => String(item.id || item._id || index)}
+        renderItem={renderNote}
           contentContainerStyle={styles.listContent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchNotes(); }} tintColor={colors.primary} />}
           ListEmptyComponent={<Text style={[styles.emptyText, {color: colors.textMuted}]}>No notes available yet.</Text>}
@@ -149,12 +177,17 @@ const styles = StyleSheet.create({
   listContent: {paddingHorizontal: 20, paddingBottom: 20},
   card: {borderRadius: 18, padding: 16, marginBottom: 14, borderWidth: 1},
   cardTitle: {fontSize: 17, fontWeight: '700'},
+  noteImage: {width: 72, height: 72, borderRadius: 14, marginTop: 12, backgroundColor: "white"},
+  imagePlaceholder: {width: 72, height: 72, borderRadius: 14, marginTop: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1},
+  imagePlaceholderText: {fontSize: 13, fontWeight: '600'},
   cardBody: {marginTop: 8, fontSize: 14, lineHeight: 20},
   actions: {flexDirection: 'row', marginTop: 14, gap: 10},
   primaryBtn: {flex: 1, paddingVertical: 10, borderRadius: 999, alignItems: 'center'},
   primaryText: {color: '#fff', fontWeight: '700'},
   secondaryBtn: {flex: 1, paddingVertical: 10, borderRadius: 999, alignItems: 'center', borderWidth: 1},
   secondaryText: {fontWeight: '600'},
+  downloadBtn: {marginTop: 10, paddingVertical: 10, borderRadius: 999, alignItems: 'center', borderWidth: 1},
+  downloadText: {fontWeight: '700'},
   stateBox: {flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24},
   stateText: {marginTop: 12, fontSize: 15, textAlign: 'center'},
   retryBtn: {marginTop: 14, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 999},

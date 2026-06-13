@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -10,11 +10,33 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DARK_THEME, LIGHT_THEME, useTheme} from '../context/ThemeContext';
 import {useBookmarks} from '../context/BookmarksContext';
+import {getCachedBlog} from '../utils/storage';
 
 export default function BookmarksScreen({navigation}) {
   const {theme} = useTheme();
   const colors = theme === 'dark' ? DARK_THEME : LIGHT_THEME;
   const {bookmarks, toggleBookmark} = useBookmarks();
+  const [bookmarkDetails, setBookmarkDetails] = useState([]);
+
+  useEffect(() => {
+    const loadBookmarks = async () => {
+      const details = [];
+      for (const item of bookmarks) {
+        const blogId = item.id || item._id || item.blogId;
+        if (blogId) {
+          const cachedBlog = await getCachedBlog(blogId);
+          if (cachedBlog) {
+            details.push(cachedBlog);
+          } else {
+            details.push(item);
+          }
+        }
+      }
+      setBookmarkDetails(details);
+    };
+
+    loadBookmarks();
+  }, [bookmarks]);
 
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}> 
@@ -26,12 +48,12 @@ export default function BookmarksScreen({navigation}) {
           </View>
         </View>
 
-        {bookmarks.length === 0 ? (
+        {bookmarkDetails.length === 0 ? (
           <View style={[styles.emptyCard, {backgroundColor: colors.surface, borderColor: colors.border}]}> 
             <Text style={[styles.emptyText, {color: colors.textMuted}]}>No bookmarked blogs yet.</Text>
           </View>
         ) : (
-          bookmarks.map((item, index) => {
+          bookmarkDetails.map((item, index) => {
             const title = item.title || item.name || 'Untitled blog';
             const blogId = item.id || item._id || item.blogId;
 
