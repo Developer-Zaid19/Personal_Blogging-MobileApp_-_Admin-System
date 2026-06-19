@@ -7,12 +7,15 @@ import BlogDetailScreen from '../screens/BlogDetailScreen';
 import NoteDetailScreen from '../screens/NoteDetailScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import BookmarksScreen from '../screens/BookmarksScreen';
+import AdminScreen from '../screens/AdminScreen';
+import UploadBlogScreen from '../screens/UploadBlogScreen';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {DARK_THEME, LIGHT_THEME, useTheme} from '../context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 const BlogStack = createNativeStackNavigator();
 const NoteStack = createNativeStackNavigator();
+const AdminStack = createNativeStackNavigator();
 
 function BlogStackScreen() {
   return (
@@ -29,6 +32,15 @@ function NoteStackScreen() {
       <NoteStack.Screen name="Notes" component={NotesScreen} />
       <NoteStack.Screen name="NoteDetail" component={NoteDetailScreen} />
     </NoteStack.Navigator>
+  );
+}
+
+function AdminStackScreen() {
+  return (
+    <AdminStack.Navigator screenOptions={{headerShown: false}}>
+      <AdminStack.Screen name="Dashboard" component={AdminScreen} />
+      <AdminStack.Screen name="UploadBlog" component={UploadBlogScreen} />
+    </AdminStack.Navigator>
   );
 }
 
@@ -59,6 +71,8 @@ export default function BottomTabs() {
             iconName = 'bookmark';
           } else if (route.name === 'Settings') {
             iconName = 'cog';
+          } else if (route.name === 'AdminTab') {
+            iconName = 'cog';
           }
 
           return <Icon name={iconName} color={color} size={size} />;
@@ -69,13 +83,23 @@ export default function BottomTabs() {
         component={BlogStackScreen}
         options={{tabBarLabel: 'Blogs'}}
       />
+
       <Tab.Screen name="Bookmarks" component={BookmarksScreen} />
+
       <Tab.Screen
         name="NoteTab"
         component={NoteStackScreen}
         options={{tabBarLabel: 'Notes'}}
       />
+
+      <Tab.Screen
+        name="AdminTab"
+        component={AdminStackScreen}
+        options={{tabBarLabel: 'Admin'}}
+      />
+
       <Tab.Screen name="Settings" component={SettingsScreen} />
+
     </Tab.Navigator>
   );
 }
