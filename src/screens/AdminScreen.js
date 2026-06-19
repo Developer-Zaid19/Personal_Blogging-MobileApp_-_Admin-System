@@ -6,6 +6,7 @@ import {
     Text,
     TouchableOpacity,
     View,
+    RefreshControl,
 } from "react-native";
 import tw from "twrnc";
 
@@ -29,6 +30,23 @@ export default function AdminScreen({ navigation }) {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [refreshing, setRefreshing] = useState(false);
+
+
+    const onRefresh = async () => {
+        try {
+            setRefreshing(true);
+
+            await Promise.all([
+                fetchStats()
+            ]);
+
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setRefreshing(false);
+        }
+    };
 
     const fetchStats = async () => {
         try {
@@ -57,6 +75,7 @@ export default function AdminScreen({ navigation }) {
 
     useEffect(() => {
         fetchStats();
+        onRefresh();
     }, []);
 
     return (
@@ -144,8 +163,13 @@ export default function AdminScreen({ navigation }) {
             ) : (
                 <ScrollView
                     contentContainerStyle={tw`p-5`}
-                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />}
                 >
+
                     <View style={tw`flex-row`}>
                         <View
                             style={[
@@ -242,7 +266,8 @@ export default function AdminScreen({ navigation }) {
                         </Text>
                     </View>
                 </ScrollView>
-            )}
+            )
+            }
 
             <TouchableOpacity
                 onPress={() => navigation.navigate("UploadBlog")}
@@ -273,6 +298,6 @@ export default function AdminScreen({ navigation }) {
                     Create and publish a new blog post
                 </Text>
             </TouchableOpacity>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }

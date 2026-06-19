@@ -72,7 +72,7 @@ export default function BottomTabs() {
           } else if (route.name === 'Settings') {
             iconName = 'cog';
           } else if (route.name === 'AdminTab') {
-            iconName = 'cog';
+            iconName = 'account-cog';
           }
 
           return <Icon name={iconName} color={color} size={size} />;
