@@ -104,7 +104,7 @@ export default function UploadBlogScreen() {
                 <TextInput
                     value={content}
                     onChangeText={setContent}
-                    placeholder="Content"
+                    placeholder="Paragraph 1"
                     placeholderTextColor={colors.textMuted}
                     multiline
                     style={[tw`rounded-2xl p-4 mb-4`, { backgroundColor: colors.card, color: colors.text, minHeight: 150, borderColor: colors.border, borderWidth: 1, }]}
@@ -113,7 +113,7 @@ export default function UploadBlogScreen() {
                 <TextInput
                     value={para1}
                     onChangeText={setPara1}
-                    placeholder="Paragraph 1"
+                    placeholder="Paragraph 2"
                     placeholderTextColor={colors.textMuted}
                     multiline
                     style={[tw`rounded-2xl p-4 mb-4`, { backgroundColor: colors.card, color: colors.text, minHeight: 120, borderColor: colors.border, borderWidth: 1, }]}
@@ -122,7 +122,7 @@ export default function UploadBlogScreen() {
                 <TextInput
                     value={para2}
                     onChangeText={setPara2}
-                    placeholder="Paragraph 2"
+                    placeholder="Paragraph 3"
                     placeholderTextColor={colors.textMuted}
                     multiline
                     style={[tw`rounded-2xl p-4 mb-6`, { backgroundColor: colors.card, color: colors.text, minHeight: 120, borderColor: colors.border, borderWidth: 1, }]}
