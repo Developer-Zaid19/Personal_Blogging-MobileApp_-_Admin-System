@@ -9,6 +9,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import BookmarksScreen from '../screens/BookmarksScreen';
 import AdminScreen from '../screens/AdminScreen';
 import UploadBlogScreen from '../screens/UploadBlogScreen';
+import EditBlogScreen from '../screens/EditBlogScreen'
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {DARK_THEME, LIGHT_THEME, useTheme} from '../context/ThemeContext';
 
@@ -22,6 +23,7 @@ function BlogStackScreen() {
     <BlogStack.Navigator screenOptions={{headerShown: false}}>
       <BlogStack.Screen name="Blogs" component={BlogsScreen} />
       <BlogStack.Screen name="BlogDetail" component={BlogDetailScreen} />
+      <BlogStack.Screen name="EditBlog" component={EditBlogScreen} />
     </BlogStack.Navigator>
   );
 }

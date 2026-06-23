@@ -102,7 +102,7 @@ export default function BlogsScreen({ navigation }) {
   const renderBlog = ({ item }) => {
     const title = item.title || item.name || 'Untitled blog';
     const snippet = item.description || item.excerpt || item.summary || (item.content ? item.content.slice(0, 120) : 'Tap to read the full post.');
-    const blogId = item.id || item._id || item.blogId;
+    const blogId = item.id ;
 
     return (
       <TouchableOpacity
@@ -113,6 +113,23 @@ export default function BlogsScreen({ navigation }) {
           <Text style={[styles.cardTitle, { color: colors.text }]}>{title}</Text>
           <TouchableOpacity onPress={() => toggleBookmark(item)}>
             <Icon name={isBookmarked(item) ? 'bookmark' : 'bookmark-outline'} size={20} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("EditBlog", {
+                blogId: blogId,
+              })
+            }
+            style={{
+              padding: 8,
+              borderRadius: 10,
+            }}
+          >
+            <Icon
+              name="pencil-outline"
+              size={24}
+              color={colors.primary}
+            />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() =>
